@@ -1,0 +1,11 @@
+{
+  "_source": "GEMI, KRI-KRI, retrieved 2026-09-07",
+  "_note": "ESEF filer: the PDF is only the GEMI announcement, the statements sit behind a QR link. Refusing is correct.",
+  "status": "unparseable",
+  "reason": "statements_not_attached",
+  "ar_gemi": "113772252000",
+  "fiscal_year": null,
+  "unit_multiplier": 1,
+  "currency": "EUR",
+  "figures": {}
+}

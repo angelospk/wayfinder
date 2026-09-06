@@ -1,0 +1,13 @@
+[project]
+name = "wayfinder-extract"
+version = "0.1.0"
+description = "Extract financial figures from Greek GEMI balance-sheet PDFs"
+requires-python = ">=3.11"
+dependencies = ["pdfplumber>=0.11"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

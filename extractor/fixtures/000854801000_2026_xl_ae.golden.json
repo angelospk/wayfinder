@@ -1,0 +1,11 @@
+{
+  "_source": "GEMI, TITAN TSIMENTA ATLANTIKOU, retrieved 2026-09-07",
+  "_note": "30-page scan: 2988 text chars total, tables are images. Refusing is correct.",
+  "status": "unparseable",
+  "reason": "no_text_layer",
+  "ar_gemi": "000854801000",
+  "fiscal_year": null,
+  "unit_multiplier": 1,
+  "currency": "EUR",
+  "figures": {}
+}

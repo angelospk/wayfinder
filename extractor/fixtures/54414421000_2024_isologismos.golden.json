@@ -1,0 +1,18 @@
+{
+  "_source": "GEMI downloadFile key=assemblyDecision elementId=5503973, retrieved 2026-09-07",
+  "_verified_by": "hand-read against pdftotext -layout output of pages 2-3",
+  "status": "parsed",
+  "ar_gemi": "054414421000",
+  "afm": "094274613",
+  "fiscal_year": 2024,
+  "unit_multiplier": 1,
+  "currency": "EUR",
+  "figures": {
+    "turnover":       {"value": 339878.25},
+    "total_assets":   {"value": 1109512.73},
+    "equity":         {"value": 135370.23},
+    "pre_tax_profit": {"value": -29755.57},
+    "net_profit":     {"value": -29755.57},
+    "ebitda":         {"value": -3900.02}
+  }
+}

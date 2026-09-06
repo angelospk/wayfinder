@@ -3,3 +3,7 @@ node_modules/
 dist/
 .dev.vars
 __pycache__/
+.venv/
+.pytest_cache/
+*.pyc
+.astro/
