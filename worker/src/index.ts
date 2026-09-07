@@ -24,6 +24,13 @@ const CORS = {
   "access-control-max-age": "86400",
 };
 
+/**
+ * A filing has to be buffered to be cached, and the Worker has 128 MB of
+ * memory. Real ΓΕΜΗ filings run to a couple of megabytes; anything far past
+ * that is a document we would rather send people to the registry for.
+ */
+const MAX_PDF_BYTES = 20 * 1024 * 1024;
+
 const ATTRIBUTION =
   "Πηγή: Γ.Ε.ΜΗ. OpenData (opendata.businessportal.gr), ODC-BY-1.0";
 
@@ -166,9 +173,23 @@ async function document(env: Env, arGemi: string, elementId: string | undefined,
   if (cached) return withCors(cached);
 
   const upstream = await dispatcher(env).fetchFile(fileKey, elementId);
-  if (!upstream.ok) return withCors(upstream);
+  if (!upstream.ok) {
+    // Do not pass the upstream body or headers through: it may name GEMI
+    // internals, and a 503 here means "we are pacing", not "GEMI said this".
+    return json(
+      { data: null, meta: { state: "unavailable", reason: `upstream_${upstream.status}` } },
+      { status: 503, headers: { "retry-after": upstream.headers.get("retry-after") ?? "60" } },
+    );
+  }
 
+  const declared = Number(upstream.headers.get("content-length") ?? 0);
+  if (declared > MAX_PDF_BYTES) {
+    return json({ error: "document_too_large", bytes: declared }, { status: 413 });
+  }
   const body = await upstream.arrayBuffer();
+  if (body.byteLength > MAX_PDF_BYTES) {
+    return json({ error: "document_too_large", bytes: body.byteLength }, { status: 413 });
+  }
   const res = new Response(body, {
     headers: {
       "content-type": "application/pdf",

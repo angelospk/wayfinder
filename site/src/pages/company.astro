@@ -45,12 +45,20 @@ import Base from "../layouts/Base.astro";
     async function render() {
       app.innerHTML = `<p class="spinner">Φόρτωση στοιχείων για ΓΕΜΗ ${esc(gemi)}…</p>`;
 
-      const res = await company(gemi, (meta) => {
+      let res;
+      try {
+        res = await company(gemi, (meta) => {
         app.innerHTML = `<h1>Ζητήθηκε από το Γ.Ε.ΜΗ.</h1>
           <p class="hint">Θέση στην ουρά: ${meta.queue_position ?? "—"}.
           Το μητρώο επιτρέπει 8 αιτήματα το λεπτό σε όλον τον ιστότοπο, οπότε
           η πρώτη προβολή μιας εταιρείας περιμένει λίγο.</p>`;
-      });
+        });
+      } catch {
+        app.innerHTML = `<h1>Δεν ήταν δυνατή η επικοινωνία με την υπηρεσία</h1>
+          <p class="hint">Έλεγξε τη σύνδεσή σου και δοκίμασε ξανά.</p>
+          <p><a href="${base}">Πίσω στην αναζήτηση</a></p>`;
+        return;
+      }
 
       if (res.httpStatus === 404) {
         app.innerHTML = `<h1>Δεν βρέθηκε</h1>
@@ -105,8 +113,15 @@ import Base from "../layouts/Base.astro";
 
     async function loadFinancials() {
       const box = document.getElementById("financials")!;
-      const res = await financials(gemi);
-      const years = (res.data ?? []) as Financials[];
+      let years: Financials[];
+      try {
+        const res = await financials(gemi);
+        years = (res.data ?? []) as Financials[];
+      } catch {
+        box.innerHTML = `<h2>Οικονομικά στοιχεία</h2>
+          <p class="hint">Δεν φορτώθηκαν. Δοκίμασε ανανέωση της σελίδας.</p>`;
+        return;
+      }
       if (!years.length) {
         box.innerHTML = `<h2>Οικονομικά στοιχεία</h2>
           <p class="hint">Δεν έχουμε ακόμη επεξεργαστεί ισολογισμό για αυτή την εταιρεία.
@@ -142,7 +157,7 @@ import Base from "../layouts/Base.astro";
         : "";
       return `<div class="card">
         <strong>Χρήση ${esc(y.fiscal_year)}</strong>
-        ${y.unit_multiplier !== 1 ? `<span class="badge">ποσά σε χιλιάδες</span>` : ""}
+        ${y.unit_multiplier !== 1 ? `<span class="badge">το έγγραφο γράφει χιλιάδες· εδώ σε ευρώ</span>` : ""}
         ${partial}
         <table class="figures">${rows}</table>
         <p class="stamp">Δική μας ανάγνωση του επίσημου εγγράφου, όχι στοιχείο του Γ.Ε.ΜΗ.</p>
@@ -153,11 +168,18 @@ import Base from "../layouts/Base.astro";
     async function loadFilings() {
       const box = document.getElementById("filings")!;
       box.innerHTML = `<h2>Δημοσιεύσεις</h2><p class="spinner">Φόρτωση…</p>`;
-      const res = await documents(gemi, (meta) => {
+      let buckets: Record<string, Filing[]>;
+      try {
+        const res = await documents(gemi, (meta) => {
+          box.innerHTML = `<h2>Δημοσιεύσεις</h2>
+            <p class="spinner">Σε ουρά, θέση ${meta.queue_position ?? "—"}…</p>`;
+        });
+        buckets = (res.data ?? {}) as Record<string, Filing[]>;
+      } catch {
         box.innerHTML = `<h2>Δημοσιεύσεις</h2>
-          <p class="spinner">Σε ουρά, θέση ${meta.queue_position ?? "—"}…</p>`;
-      });
-      const buckets = res.data ?? {};
+          <p class="hint">Δεν φορτώθηκαν. Δοκίμασε ανανέωση της σελίδας.</p>`;
+        return;
+      }
       const all: Filing[] = Object.values(buckets).flat().filter(Boolean) as Filing[];
       if (!all.length) {
         box.innerHTML = `<h2>Δημοσιεύσεις</h2><p class="hint">Καμία καταχωρημένη δημοσίευση.</p>`;

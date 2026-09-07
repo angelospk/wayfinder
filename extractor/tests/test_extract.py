@@ -92,3 +92,13 @@ def test_balance_sheet_identity_is_enforced():
          "long_term_liabilities": 35.0, "short_term_liabilities": 30.0}
     )
     assert not ok and problems
+
+
+def test_a_four_digit_amount_is_not_mistaken_for_a_year():
+    """An equity of 2.024 € prints exactly like the year 2024."""
+    from wayfinder_extract.text import is_money, parse_money
+
+    assert is_money("2024")
+    assert parse_money("2024") == 2024.0
+    assert is_money("1.234")
+    assert not is_money("Πάγια")

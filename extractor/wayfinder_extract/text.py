@@ -21,11 +21,15 @@ def normalize(s: str) -> str:
 
 
 def is_money(token: str) -> bool:
+    """Whether a token is an amount.
+
+    A bare four-digit number is accepted: an equity of 2.024 € is printed
+    exactly like the year 2024. Column headers are recognised before rows are
+    split, so a header is never offered to this function as data.
+    """
     t = token.strip()
     if not t or not any(ch.isdigit() for ch in t):
         return False
-    if re.fullmatch(r"\d{4}", t):
-        return False  # a bare 4-digit year is a column header, not an amount
     return bool(_MONEY.match(t))
 
 

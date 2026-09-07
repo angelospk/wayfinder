@@ -59,6 +59,10 @@ jobs:
           fi
           python tools/extract_pending.py "${args[@]}"
 
+      # The site reads figures from the Worker's /financials route, so nothing
+      # here needs a Pages rebuild. data/financials is a published dataset, not
+      # a build input -- which is why the usual trap (a commit made with
+      # GITHUB_TOKEN does not trigger another workflow) does not apply.
       - name: Publish the dataset
         run: |
           set -euo pipefail

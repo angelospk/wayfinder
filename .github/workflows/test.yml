@@ -30,3 +30,19 @@ jobs:
         working-directory: worker
       - run: npx vitest run
         working-directory: worker
+
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+        working-directory: site
+      - run: npm run build
+        working-directory: site
+        env:
+          PUBLIC_API_BASE: https://wayfinder.example.invalid
