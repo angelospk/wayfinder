@@ -1,0 +1,15 @@
+{
+ "status": "unparseable",
+ "reason": "ambiguous_fiscal_year",
+ "figures": {},
+ "ar_gemi": "026496140000",
+ "afm": "801265131",
+ "fiscal_year": 2025,
+ "unit_multiplier": 1,
+ "currency": "EUR",
+ "notes": [
+  "column headers disagree on the current year: [2024, 2025]"
+ ],
+ "source_element_id": "5504505",
+ "source_registered": "2025-09-16"
+}
