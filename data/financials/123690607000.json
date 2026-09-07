@@ -1,0 +1,78 @@
+{
+ "status": "partial",
+ "reason": null,
+ "ar_gemi": "123690607000",
+ "afm": null,
+ "fiscal_year": 2024,
+ "unit_multiplier": 1,
+ "currency": "EUR",
+ "figures": {
+  "turnover": {
+   "value": 156435.87,
+   "page": 3,
+   "bbox": [
+    274.08,
+    76.37,
+    301.12,
+    82.37
+   ],
+   "page_width": 595.32,
+   "page_height": 841.92,
+   "label_matched": "Κύκλος εργασιών (καθαρός)",
+   "source": "extracted"
+  },
+  "ebit": {
+   "value": 44581.49,
+   "page": 3,
+   "bbox": [
+    277.08,
+    137.81,
+    301.12,
+    143.81
+   ],
+   "page_width": 595.32,
+   "page_height": 841.92,
+   "label_matched": "Αποτελέσματα προ τόκων και φόρων",
+   "source": "extracted"
+  },
+  "pre_tax_profit": {
+   "value": 41651.1,
+   "page": 3,
+   "bbox": [
+    277.08,
+    160.85,
+    301.12,
+    166.85
+   ],
+   "page_width": 595.32,
+   "page_height": 841.92,
+   "label_matched": "Αποτελέσματα προ φόρων",
+   "source": "extracted"
+  },
+  "net_profit": {
+   "value": 32142.08,
+   "page": 3,
+   "bbox": [
+    277.08,
+    176.21,
+    301.12,
+    182.21
+   ],
+   "page_width": 595.32,
+   "page_height": 841.92,
+   "label_matched": "Αποτελέσματα περιόδου μετά από φόρους",
+   "source": "extracted"
+  }
+ },
+ "missing": [
+  "total_assets",
+  "equity"
+ ],
+ "notes": [
+  "total_assets 249691.54 != equity+liabilities 136873.8",
+  "total_assets 249691.54 != equity+total_liabilities 220046.81",
+  "ebitda: not derived, missing depreciation"
+ ],
+ "source_element_id": "5550625",
+ "source_registered": "2025-09-29"
+}

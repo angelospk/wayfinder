@@ -1,0 +1,87 @@
+{
+ "status": "parsed",
+ "reason": null,
+ "ar_gemi": "123392801000",
+ "afm": null,
+ "fiscal_year": 2017,
+ "unit_multiplier": 1,
+ "currency": "EUR",
+ "figures": {
+  "total_assets": {
+   "value": 389417.26,
+   "page": 2,
+   "bbox": [
+    321.3,
+    261.08,
+    357.23,
+    269.58
+   ],
+   "page_width": 595.45,
+   "page_height": 841.9,
+   "label_matched": "Σύνολο ενεργητικού",
+   "source": "extracted"
+  },
+  "equity": {
+   "value": -14391.77,
+   "page": 2,
+   "bbox": [
+    322.1,
+    295.18,
+    356.27,
+    303.68
+   ],
+   "page_width": 595.45,
+   "page_height": 841.9,
+   "label_matched": "Κεφάλαια και αποθεματικά",
+   "source": "extracted"
+  },
+  "turnover": {
+   "value": 241275.23,
+   "page": 2,
+   "bbox": [
+    321.35,
+    421.88,
+    357.23,
+    430.38
+   ],
+   "page_width": 595.45,
+   "page_height": 841.9,
+   "label_matched": "Κύκλος εργασιών (καθαρός)",
+   "source": "extracted"
+  },
+  "pre_tax_profit": {
+   "value": -1346.87,
+   "page": 2,
+   "bbox": [
+    324.0,
+    524.38,
+    354.13,
+    532.88
+   ],
+   "page_width": 595.45,
+   "page_height": 841.9,
+   "label_matched": "Αποτέλεσμα προ φόρων",
+   "source": "extracted"
+  },
+  "net_profit": {
+   "value": -1346.87,
+   "page": 2,
+   "bbox": [
+    324.0,
+    547.18,
+    354.33,
+    555.68
+   ],
+   "page_width": 595.45,
+   "page_height": 841.9,
+   "label_matched": "Αποτέλεσμα περιόδου μετά από φόρους",
+   "source": "extracted"
+  }
+ },
+ "missing": [],
+ "notes": [
+  "ebitda: not derived, interest/depreciation not shown as expenses"
+ ],
+ "source_element_id": "1554266",
+ "source_registered": "2018-10-01"
+}
