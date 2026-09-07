@@ -24,6 +24,7 @@ import Base from "../layouts/Base.astro";
       ebitda: "EBITDA",
       net_profit: "Αποτέλεσμα μετά από φόρους",
       pre_tax_profit: "Αποτέλεσμα προ φόρων",
+      ebit: "Αποτέλεσμα προ τόκων και φόρων",
       total_assets: "Σύνολο ενεργητικού",
       equity: "Ίδια κεφάλαια",
     };
@@ -33,6 +34,11 @@ import Base from "../layouts/Base.astro";
       statements_not_attached: "Η ανακοίνωση του Γ.Ε.ΜΗ. δεν περιέχει τις καταστάσεις — βρίσκονται σε ξεχωριστό σύνδεσμο.",
       no_financial_table: "Δεν βρέθηκε πίνακας οικονομικών στοιχείων στο έγγραφο.",
       ambiguous_fiscal_year: "Το έγγραφο δεν δηλώνει καθαρά ποια χρήση αφορά η κάθε στήλη.",
+      multi_column_layout: "Το έγγραφο δείχνει Όμιλο και Εταιρεία μαζί, ή δύο πίνακες δίπλα-δίπλα. Δεν ξεχωρίζουμε με βεβαιότητα ποια στήλη αφορά την ίδια την εταιρεία.",
+      no_recognised_line_items: "Δεν αναγνωρίστηκε καμία γραμμή του ισολογισμού στη μορφή που περιμέναμε.",
+      no_documents: "Δεν βρέθηκαν δημοσιεύσεις για την εταιρεία.",
+      no_financial_filing: "Δεν έχει δημοσιευτεί ισολογισμός σε μορφή που μπορούμε να διαβάσουμε.",
+      download_failed: "Το έγγραφο δεν κατέβηκε. Θα ξαναδοκιμάσουμε.",
     };
 
     if (!gemi) {
@@ -139,7 +145,7 @@ import Base from "../layouts/Base.astro";
           Δεν δείχνουμε νούμερο που δεν είμαστε σίγουροι ότι διαβάσαμε σωστά.</div>
         </div>`;
       }
-      const order = ["turnover", "ebitda", "net_profit", "pre_tax_profit", "total_assets", "equity"];
+      const order = ["turnover", "ebitda", "ebit", "net_profit", "pre_tax_profit", "total_assets", "equity"];
       const rows = order
         .filter((k) => y.figures[k])
         .map((k) => {

@@ -34,4 +34,12 @@ def check_identities(values: dict) -> tuple[bool, list[str]]:
                 f"total_assets {total} != equity+liabilities {sum(parts)}"
             )
 
+    # Full ELP statements print one liabilities total instead of two.
+    equity, liabilities = values.get("equity"), values.get("total_liabilities")
+    if total is not None and equity is not None and liabilities is not None:
+        if not _close(total, equity + liabilities):
+            problems.append(
+                f"total_assets {total} != equity+total_liabilities {equity + liabilities}"
+            )
+
     return (not problems), problems

@@ -1,0 +1,11 @@
+{
+  "_source": "GEMI, ΦΑΓΕ Ελλάδας Βιομηχανία Γάλακτος, elementId 6094252, retrieved 2026-09-07",
+  "_note": "IFRS filing on landscape pages with two tables printed side by side, so one printed line carries line items from both. Refusing is correct. The document declares amounts in thousands, which we still record even when refusing.",
+  "status": "unparseable",
+  "reason": "multi_column_layout",
+  "ar_gemi": "000306201000",
+  "fiscal_year": null,
+  "unit_multiplier": 1000,
+  "currency": "EUR",
+  "figures": {}
+}

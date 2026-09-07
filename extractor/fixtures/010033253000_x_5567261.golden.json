@@ -1,0 +1,11 @@
+{
+  "_source": "GEMI, ΟΜΗΡΟΣ ΒΙΟΜΗΧΑΝΙΑ ΓΑΛΑΚΤΟΣ ΑΕΒΕ, elementId 5567261, retrieved 2026-09-07",
+  "_note": "Prints Όμιλος beside Εταιρεία: every header names the same two years twice. Refusing is correct; picking the wrong pair would report the group's figures as the company's.",
+  "status": "unparseable",
+  "reason": "multi_column_layout",
+  "ar_gemi": "010033253000",
+  "fiscal_year": null,
+  "unit_multiplier": 1,
+  "currency": "EUR",
+  "figures": {}
+}

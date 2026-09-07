@@ -18,6 +18,8 @@ MIN_TEXT_CHARS = 200         # below this a PDF is a scan, not a document
 MIN_CHARS_PER_TEXT_PAGE = 300  # a page with less is a scanned image with a stamp
 
 _YEAR = re.compile(r"(?<!\d)((?:19|20)\d{2})(?!\d)")
+# A token that is only a date or a year: "2024", "31.12.2024", "1/1-31/12/2024".
+_DATEY = re.compile(r"^[\d./\-]*(?:19|20)\d{2}[\d./\-]*$")
 _GEMI = re.compile(r"Γ\s*\.?\s*Ε\s*\.?\s*ΜΗ\s*\.?\s*:?\s*(\d{9,14})")
 _AFM = re.compile(r"Α\s*\.?\s*Φ\s*\.?\s*Μ\s*\.?\s*:?\s*(\d{9})")
 _PERIOD_END = re.compile(r"έως\s*(\d{2})/(\d{2})/((?:19|20)\d{2})")
@@ -63,18 +65,39 @@ def _rows(page) -> list[list[dict]]:
             for _, ws in sorted(buckets.items())]
 
 
+# "6.13", "6.1.1", "6.5.1.1": the Σημ. column of a full ELP statement points at
+# a note. It is not an amount and it is not part of the line item's name.
+_NOTE_REF = re.compile(r"^\d+(?:\.\d+)+$")
+
+
 def _split_row(words: list[dict]) -> tuple[str, list[dict]]:
-    money = [w for w in words if is_money(w["text"])]
-    label = " ".join(w["text"] for w in words if w not in money)
-    return label, money
+    money, label_parts = [], []
+    for w in words:
+        if is_money(w["text"]):
+            money.append(w)
+        elif not _NOTE_REF.match(w["text"]):
+            label_parts.append(w["text"])
+    return " ".join(label_parts), money
+
+
+MAX_HEADER_TOKENS = 8
 
 
 def _year_columns(row_text: str, words: list[dict]):
     """If this printed line is a column header, return the years left to right.
 
-    A header names two consecutive years. Document headers such as
-    'από 01/01/2024 έως 31/12/2024' name only one and are ignored.
+    A header names two consecutive years and nothing else numeric. That last
+    part matters: a full ELP filing is full of sentences that mention two years
+    ("εγκρίθηκαν την 05/08/2025 και αφορούν τη χρήση 2024"), and of note rows
+    that print a date beside an amount. Neither says which column is which.
     """
+    if len(words) > MAX_HEADER_TOKENS:
+        return None
+    for w in words:
+        text = w["text"]
+        if any(ch.isdigit() for ch in text) and not _DATEY.match(text):
+            return None
+
     years = _YEAR.findall(row_text)
     distinct = list(dict.fromkeys(years))
     if len(distinct) != 2:
@@ -94,6 +117,19 @@ def _year_columns(row_text: str, words: list[dict]):
 
 
 
+
+def _has_dual_scope_header(pages) -> bool:
+    """A header that names the same two years twice is a Όμιλος/Εταιρεία table."""
+    for _, _, rows in pages:
+        for words in rows:
+            if len(words) > MAX_HEADER_TOKENS:
+                continue
+            years = [w for w in words if _DATEY.match(w["text"]) and _YEAR.search(w["text"])]
+            if len(years) >= 4 and len({_YEAR.search(w["text"]).group(1) for w in years}) == 2:
+                return True
+    return False
+
+
 def _all_headers(pages) -> list[list[int]]:
     out = []
     for _, _, rows in pages:
@@ -107,25 +143,47 @@ def _all_headers(pages) -> list[list[int]]:
 def _pick_fiscal_year(headers, period_end_years, notes) -> int | None:
     """Two independent sources must agree on which year we are reporting.
 
-    The column headers say which years the table prints; the announcement text
+    The column headers say which years each table prints; the announcement text
     says which periods the filing covers. We only accept a year both agree on,
     because picking the wrong one silently publishes last year's turnover.
+
+    A full ELP filing has many tables and they do not all print the same pair of
+    years -- a note may compare 2023 with 2022 -- so agreement means "exactly one
+    candidate survives the intersection", not "every table said the same thing".
     """
     if not headers:
         notes.append("no year column header found in the document")
         return None
-    header_years = {max(h) for h in headers}
-    if len(header_years) != 1:
-        notes.append(f"column headers disagree on the current year: {sorted(header_years)}")
+    counts: dict[int, int] = {}
+    for h in headers:
+        counts[max(h)] = counts.get(max(h), 0) + 1
+    header_years = set(counts)
+
+    if period_end_years:
+        agreed = header_years & set(period_end_years)
+        if len(agreed) == 1:
+            return agreed.pop()
+        if agreed:
+            # Several candidates survive. Let the tables vote: a stray sentence
+            # cannot outweigh every column header in the document.
+            best = max(agreed, key=lambda y: counts[y])
+            if counts[best] >= 3 * sum(counts[y] for y in agreed if y != best):
+                return best
+            notes.append(f"more than one year could be the reporting year: {sorted(agreed)}")
+            return None
+        if not agreed:
+            notes.append(
+                f"no column header year {sorted(header_years)} matches the reporting "
+                f"periods {period_end_years} named in the text"
+            )
+            return None
+        notes.append(f"more than one year could be the reporting year: {sorted(agreed)}")
         return None
-    year = header_years.pop()
-    if period_end_years and year not in period_end_years:
-        notes.append(
-            f"column header year {year} is not among the reporting periods "
-            f"{period_end_years} named in the text"
-        )
-        return None
-    return year
+
+    if len(header_years) == 1:
+        return header_years.pop()
+    notes.append(f"column headers disagree on the current year: {sorted(header_years)}")
+    return None
 
 
 
@@ -197,6 +255,13 @@ def extract(pdf_bytes: bytes) -> dict:
         notes: list[str] = []
 
         headers = _all_headers(pages)
+        if _has_dual_scope_header(pages):
+            # "31.12.2024 31.12.2023 31.12.2024 31.12.2023": Όμιλος beside
+            # Εταιρεία. Both scopes use the same line-item names, and picking
+            # the wrong pair reports the group's turnover as the company's.
+            out = _refuse("multi_column_layout", facts)
+            out["notes"] = notes + ["header repeats the same two years twice"]
+            return out
         facts["fiscal_year"] = _pick_fiscal_year(
             headers, facts["period_end_years"], notes
         )
@@ -235,7 +300,9 @@ def extract(pdf_bytes: bytes) -> dict:
                     )
                     continue
                 if len(money) != len(columns):
-                    # e.g. an accumulated-depreciation row carrying a sub-column.
+                    # Either a sub-column (accumulated depreciation), or the row
+                    # holds the same line item twice: Όμιλος next to Εταιρεία, or
+                    # two tables printed side by side on a landscape page.
                     notes.append(
                         f"{key}: {len(money)} amounts for {len(columns)} year columns"
                     )
@@ -265,7 +332,7 @@ def extract(pdf_bytes: bytes) -> dict:
     _derive_ebitda(found, notes)
 
     figures = {k: v for k, v in found.items() if k in labels.PUBLIC}
-    missing = [k for k in labels.PUBLIC if k not in figures]
+    missing = [k for k in labels.REQUIRED if k not in figures]
     if not figures:
         out = _refuse("no_recognised_line_items", facts)
         out["notes"] = notes

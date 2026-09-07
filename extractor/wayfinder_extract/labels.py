@@ -30,6 +30,14 @@ _SPECS = [
     ("short_term_liabilities",
      r"^ΒΡΑΧΥΠΡΟΘΕΣΜΕΣ ΥΠΟΧΡΕΩΣΕΙΣ$|^ΣΥΝΟΛΟ ΒΡΑΧΥΠΡΟΘΕΣΜΩΝ ΥΠΟΧΡΕΩΣΕΩΝ$", None),
 
+    # Printed directly in the "κατά λειτουργία" income statement, where
+    # depreciation is folded into cost of sales and cannot be recovered.
+    ("ebit",
+     r"^ΑΠΟΤΕΛΕΣΜΑΤ?Α? ΠΡΟ ΤΟΚΩΝ ΚΑΙ ΦΟΡΩΝ$|^ΚΕΡΔΗ ΖΗΜΙΕΣ ΠΡΟ ΤΟΚΩΝ ΚΑΙ ΦΟΡΩΝ$", None),
+
+    ("total_liabilities",
+     r"^ΣΥΝΟΛΟ ΥΠΟΧΡΕΩΣΕΩΝ$|^ΣΥΝΟΛΟ ΠΡΟΒΛΕΨΕΩΝ ΚΑΙ ΥΠΟΧΡΕΩΣΕΩΝ$", None),
+
     ("pre_tax_profit",
      r"^ΑΠΟΤΕΛΕΣΜΑΤ?Α? ΠΡΟ ΦΟΡΩΝ$|^ΚΕΡΔΗ ΖΗΜΙΕΣ ΠΡΟ ΦΟΡΩΝ$|^ΚΕΡΔΗ ΠΡΟ ΦΟΡΩΝ$", None),
 
@@ -54,9 +62,14 @@ SPECS = [
 
 # What the site is allowed to show. The rest feed derivation and validation.
 PUBLIC = (
-    "turnover", "ebitda", "net_profit", "pre_tax_profit",
+    "turnover", "ebitda", "ebit", "net_profit", "pre_tax_profit",
     "total_assets", "equity",
 )
+
+# Without these four there is no useful picture of a company, so their absence
+# makes a reading "partial". EBIT and EBITDA depend on which income-statement
+# format the filer chose, so missing them is normal, not a defect.
+REQUIRED = ("turnover", "net_profit", "total_assets", "equity")
 
 
 def match(label_norm: str):

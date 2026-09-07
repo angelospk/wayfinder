@@ -1,0 +1,19 @@
+{
+  "_source": "GEMI, ΒΙΟΜΗΧΑΝΙΑ ΓΑΛΑΚΤΟΣ ΝΙΚΖΑΣ ΑΕ, elementId 5504505, retrieved 2026-09-07",
+  "_note": "Full ELP (Β1/Β2) statements: Σημ. column, dates as column headers, parentheses for negatives.",
+  "_verified_by": "hand-read against pdftotext -layout, pages 8-10",
+  "status": "parsed",
+  "ar_gemi": "026496140000",
+  "afm": null,
+  "fiscal_year": 2024,
+  "unit_multiplier": 1,
+  "currency": "EUR",
+  "figures": {
+    "turnover":       {"value": 25521800},
+    "total_assets":   {"value": 26367267},
+    "equity":         {"value": 11934096},
+    "ebit":           {"value": 1430184},
+    "pre_tax_profit": {"value": 946616},
+    "net_profit":     {"value": 726666}
+  }
+}
