@@ -1,0 +1,34 @@
+---
+import "../styles/global.css";
+const { title, description } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+<!doctype html>
+<html lang="el">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href={`${base}favicon.svg`} />
+  </head>
+  <body>
+    <header class="site">
+      <div class="wrap">
+        <a class="brand" href={base}>wayfinder</a>
+        <span class="tag">δημόσια στοιχεία ελληνικών επιχειρήσεων</span>
+      </div>
+    </header>
+    <main class="wrap"><slot /></main>
+    <footer class="site">
+      <div class="wrap">
+        <p>
+          Πηγή: <a href="https://opendata.businessportal.gr/" rel="noopener">Γ.Ε.ΜΗ. OpenData</a>,
+          άδεια <a href="https://opendatacommons.org/licenses/by/1-0/" rel="noopener">ODC-BY-1.0</a>.
+          Ο ιστότοπος δείχνει χρονοσφραγισμένα αντίγραφα του μητρώου, όχι ζωντανή εικόνα του.
+        </p>
+        <p>Ελεύθερο και δωρεάν. Χωρίς λογαριασμούς, χωρίς συνδρομή.</p>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,91 @@
+---
+import Base from "../layouts/Base.astro";
+---
+<Base
+  title="wayfinder — δημόσια στοιχεία ελληνικών επιχειρήσεων"
+  description="Αναζήτηση εταιρειών στο Γ.Ε.ΜΗ. με επίσημα ανοιχτά δεδομένα. Δωρεάν, χωρίς λογαριασμό."
+>
+  <h1>Ψάξε μια ελληνική εταιρεία</h1>
+  <p class="hint">Με επωνυμία, ΑΦΜ ή αριθμό Γ.Ε.ΜΗ. Τα στοιχεία έρχονται από το επίσημο Γ.Ε.ΜΗ. OpenData.</p>
+
+  <form class="search" id="f">
+    <input id="q" name="q" placeholder="π.χ. ΞΥΛΕΜΠΟΡΙΑ ΘΡΑΚΗΣ ή 054414421000" autocomplete="off" required />
+    <button type="submit">Αναζήτηση</button>
+  </form>
+
+  <p class="hint" id="status"></p>
+  <div id="results"></div>
+
+  <h2>Τι είναι αυτό</h2>
+  <p>
+    Το Γ.Ε.ΜΗ. δημοσιεύει τα στοιχεία κάθε ελληνικής επιχείρησης ως ανοιχτά δεδομένα.
+    Το wayfinder τα δείχνει όπως είναι, δωρεάν, με αναφορά στην πηγή και στην ημερομηνία
+    που τα κατέβασε. Δεν κρύβει τίποτα πίσω από συνδρομή.
+  </p>
+  <p class="hint">
+    Το μητρώο επιτρέπει στον ιστότοπο 8 αιτήματα το λεπτό συνολικά. Μια εταιρεία που δεν
+    έχει ζητηθεί ποτέ πριν μπορεί να χρειαστεί μερικά δευτερόλεπτα την πρώτη φορά.
+  </p>
+
+  <script>
+    import { search, formatDate } from "../lib/api";
+
+    const form = document.getElementById("f") as HTMLFormElement;
+    const input = document.getElementById("q") as HTMLInputElement;
+    const button = form.querySelector("button") as HTMLButtonElement;
+    const status = document.getElementById("status")!;
+    const results = document.getElementById("results")!;
+    const base = import.meta.env.BASE_URL;
+
+    const digitsOnly = (s: string) => /^[\d\s.]{9,14}$/.test(s.trim());
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const q = input.value.trim();
+      if (!q) return;
+
+      // A bare number is a ΓΕΜΗ or ΑΦΜ, not a name: go straight to the company.
+      if (digitsOnly(q)) {
+        location.href = `${base}company?gemi=${encodeURIComponent(q.replace(/\D/g, ""))}`;
+        return;
+      }
+
+      button.disabled = true;
+      results.innerHTML = "";
+      status.textContent = "Αναζήτηση…";
+      try {
+        const res = await search(q);
+        if (res.httpStatus === 202) {
+          status.textContent = "Το αίτημα μπήκε σε ουρά. Δοκίμασε ξανά σε λίγο.";
+        } else if (!res.data || !res.data.searchResults?.length) {
+          status.textContent = "Καμία εταιρεία δεν ταιριάζει.";
+        } else {
+          const list = res.data.searchResults;
+          status.textContent =
+            `${res.data.searchMetadata?.totalCount ?? list.length} αποτελέσματα · ` +
+            `στοιχεία της ${formatDate(res.meta.fetched_at)}`;
+          results.innerHTML = list
+            .map((c) => {
+              const place = [c.city, c.prefecture?.descr].filter(Boolean).join(", ");
+              return `<a class="card result" href="${base}company?gemi=${encodeURIComponent(c.arGemi)}">
+                <div class="name">${escapeHtml(c.coNameEl ?? "")}</div>
+                <div class="meta">${escapeHtml(c.legalType?.descr ?? "")} ·
+                  ΓΕΜΗ ${escapeHtml(c.arGemi)} ·
+                  ${escapeHtml(c.status?.descr ?? "")}${place ? " · " + escapeHtml(place) : ""}</div>
+              </a>`;
+            })
+            .join("");
+        }
+      } catch {
+        status.textContent = "Δεν ήταν δυνατή η επικοινωνία με την υπηρεσία.";
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    function escapeHtml(s: string) {
+      return s.replace(/[&<>"']/g, (c) =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
+    }
+  </script>
+</Base>

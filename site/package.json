@@ -1,0 +1,14 @@
+{
+  "name": "wayfinder-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --host",
+    "build": "astro build",
+    "preview": "astro preview --host",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "astro": "^5.14.1"
+  }
+}

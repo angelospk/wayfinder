@@ -1,0 +1,179 @@
+---
+import Base from "../layouts/Base.astro";
+---
+<Base title="Εταιρεία — wayfinder" description="Στοιχεία εταιρείας από το Γ.Ε.ΜΗ.">
+  <div id="app"><p class="spinner">Φόρτωση…</p></div>
+
+  <script>
+    import {
+      company, documents, financials,
+      formatDate, formatMoney, elementIdOf, API_BASE,
+      type Company, type Filing, type Financials,
+    } from "../lib/api";
+
+    const app = document.getElementById("app")!;
+    const base = import.meta.env.BASE_URL;
+    const gemi = (new URLSearchParams(location.search).get("gemi") ?? "").replace(/\D/g, "");
+
+    const esc = (s: unknown) =>
+      String(s ?? "").replace(/[&<>"']/g, (c) =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
+
+    const LABELS: Record<string, string> = {
+      turnover: "Κύκλος εργασιών",
+      ebitda: "EBITDA",
+      net_profit: "Αποτέλεσμα μετά από φόρους",
+      pre_tax_profit: "Αποτέλεσμα προ φόρων",
+      total_assets: "Σύνολο ενεργητικού",
+      equity: "Ίδια κεφάλαια",
+    };
+
+    const REFUSALS: Record<string, string> = {
+      no_text_layer: "Το δημοσιευμένο PDF είναι σαρωμένη εικόνα, οπότε δεν διαβάζονται νούμερα από αυτό.",
+      statements_not_attached: "Η ανακοίνωση του Γ.Ε.ΜΗ. δεν περιέχει τις καταστάσεις — βρίσκονται σε ξεχωριστό σύνδεσμο.",
+      no_financial_table: "Δεν βρέθηκε πίνακας οικονομικών στοιχείων στο έγγραφο.",
+      ambiguous_fiscal_year: "Το έγγραφο δεν δηλώνει καθαρά ποια χρήση αφορά η κάθε στήλη.",
+    };
+
+    if (!gemi) {
+      app.innerHTML = `<h1>Λείπει ο αριθμός Γ.Ε.ΜΗ.</h1>
+        <p><a href="${base}">Πίσω στην αναζήτηση</a></p>`;
+    } else {
+      render();
+    }
+
+    async function render() {
+      app.innerHTML = `<p class="spinner">Φόρτωση στοιχείων για ΓΕΜΗ ${esc(gemi)}…</p>`;
+
+      const res = await company(gemi, (meta) => {
+        app.innerHTML = `<h1>Ζητήθηκε από το Γ.Ε.ΜΗ.</h1>
+          <p class="hint">Θέση στην ουρά: ${meta.queue_position ?? "—"}.
+          Το μητρώο επιτρέπει 8 αιτήματα το λεπτό σε όλον τον ιστότοπο, οπότε
+          η πρώτη προβολή μιας εταιρείας περιμένει λίγο.</p>`;
+      });
+
+      if (res.httpStatus === 404) {
+        app.innerHTML = `<h1>Δεν βρέθηκε</h1>
+          <p>Το Γ.Ε.ΜΗ. δεν έχει εγγραφή με αριθμό ${esc(gemi)}.</p>
+          <p><a href="${base}">Πίσω στην αναζήτηση</a></p>`;
+        return;
+      }
+      if (!res.data) {
+        app.innerHTML = `<h1>Η υπηρεσία δεν απάντησε</h1>
+          <p class="hint">${esc(res.meta.reason ?? "Δοκίμασε ξανά σε λίγο.")}</p>`;
+        return;
+      }
+
+      const c = res.data as Company;
+      app.innerHTML = header(c, res.meta.fetched_at) +
+        `<div id="financials"></div><div id="filings"></div>`;
+
+      loadFinancials();
+      loadFilings();
+    }
+
+    function header(c: Company, fetchedAt?: number) {
+      const address = [c.street, c.streetNumber, c.zipCode, c.city].filter(Boolean).join(" ");
+      const mainActivity = c.activities?.find((a) => a.isMain) ?? c.activities?.[0];
+      const rows: [string, string][] = [
+        ["Επωνυμία", c.coNameEl],
+        ["Διακριτικός τίτλος", (c.coTitlesEl ?? [])[0] ?? "—"],
+        ["Νομική μορφή", c.legalType?.descr ?? "—"],
+        ["Κατάσταση", c.status?.descr ?? "—"],
+        ["ΑΦΜ", c.afm ?? "—"],
+        ["Αρ. Γ.Ε.ΜΗ.", c.arGemi],
+        ["Έδρα", address || "—"],
+        ["Νομός", c.prefecture?.descr ?? "—"],
+        ["Σύσταση", c.incorporationDate ?? "—"],
+        ["Υπηρεσία Γ.Ε.ΜΗ.", c.gemiOffice?.descr ?? "—"],
+        ["Κύρια δραστηριότητα", mainActivity ? `${mainActivity.activity.id} — ${mainActivity.activity.descr}` : "—"],
+      ];
+      const site = c.url
+        ? `<dt>Ιστότοπος</dt><dd><a href="${esc(c.url.startsWith("http") ? c.url : "https://" + c.url)}" rel="noopener nofollow">${esc(c.url)}</a></dd>`
+        : "";
+      return `
+        <h1>${esc(c.coNameEl)}</h1>
+        <p class="stamp">Αντλήθηκε από το Γ.Ε.ΜΗ. στις ${esc(formatDate(fetchedAt))}.
+        Αλλαγές μετά από αυτή την ημερομηνία μπορεί να μην φαίνονται.</p>
+        <div class="card">
+          <dl class="facts">
+            ${rows.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}
+            ${site}
+          </dl>
+        </div>`;
+    }
+
+    async function loadFinancials() {
+      const box = document.getElementById("financials")!;
+      const res = await financials(gemi);
+      const years = (res.data ?? []) as Financials[];
+      if (!years.length) {
+        box.innerHTML = `<h2>Οικονομικά στοιχεία</h2>
+          <p class="hint">Δεν έχουμε ακόμη επεξεργαστεί ισολογισμό για αυτή την εταιρεία.
+          Οι επίσημες καταστάσεις είναι στις δημοσιεύσεις παρακάτω.</p>`;
+        return;
+      }
+      box.innerHTML = `<h2>Οικονομικά στοιχεία</h2>` + years.map(yearCard).join("");
+    }
+
+    function yearCard(y: Financials) {
+      if (y.status === "unparseable") {
+        return `<div class="card">
+          <strong>Χρήση ${esc(y.fiscal_year)}</strong>
+          <div class="notice">${esc(REFUSALS[y.reason ?? ""] ?? "Δεν διαβάστηκαν αριθμοί από το έγγραφο.")}
+          Δεν δείχνουμε νούμερο που δεν είμαστε σίγουροι ότι διαβάσαμε σωστά.</div>
+        </div>`;
+      }
+      const order = ["turnover", "ebitda", "net_profit", "pre_tax_profit", "total_assets", "equity"];
+      const rows = order
+        .filter((k) => y.figures[k])
+        .map((k) => {
+          const f = y.figures[k];
+          const derived = f.source === "derived"
+            ? ` <span class="derived">υπολογισμένο</span>` : "";
+          return `<tr><th>${esc(LABELS[k] ?? k)}${derived}</th>
+            <td class="num">${esc(formatMoney(f.value))}</td></tr>`;
+        })
+        .join("");
+      const partial = y.status === "partial"
+        ? `<div class="notice">Μερική ανάγνωση: κάποια μεγέθη δεν βρέθηκαν στο έγγραφο.</div>` : "";
+      const pdf = y.source_element_id
+        ? `<p class="stamp"><a href="${API_BASE}/api/company/${esc(gemi)}/document/${esc(y.source_element_id)}" rel="noopener">Το επίσημο PDF του Γ.Ε.ΜΗ.</a></p>`
+        : "";
+      return `<div class="card">
+        <strong>Χρήση ${esc(y.fiscal_year)}</strong>
+        ${y.unit_multiplier !== 1 ? `<span class="badge">ποσά σε χιλιάδες</span>` : ""}
+        ${partial}
+        <table class="figures">${rows}</table>
+        <p class="stamp">Δική μας ανάγνωση του επίσημου εγγράφου, όχι στοιχείο του Γ.Ε.ΜΗ.</p>
+        ${pdf}
+      </div>`;
+    }
+
+    async function loadFilings() {
+      const box = document.getElementById("filings")!;
+      box.innerHTML = `<h2>Δημοσιεύσεις</h2><p class="spinner">Φόρτωση…</p>`;
+      const res = await documents(gemi, (meta) => {
+        box.innerHTML = `<h2>Δημοσιεύσεις</h2>
+          <p class="spinner">Σε ουρά, θέση ${meta.queue_position ?? "—"}…</p>`;
+      });
+      const buckets = res.data ?? {};
+      const all: Filing[] = Object.values(buckets).flat().filter(Boolean) as Filing[];
+      if (!all.length) {
+        box.innerHTML = `<h2>Δημοσιεύσεις</h2><p class="hint">Καμία καταχωρημένη δημοσίευση.</p>`;
+        return;
+      }
+      all.sort((a, b) => (b.dateRegistrated ?? "").localeCompare(a.dateRegistrated ?? ""));
+      box.innerHTML = `<h2>Δημοσιεύσεις (${all.length})</h2>` + all.slice(0, 40).map((f) => {
+        const id = elementIdOf(f);
+        const link = id
+          ? `<a href="${API_BASE}/api/company/${esc(gemi)}/document/${esc(id)}" rel="noopener">Άνοιγμα PDF</a>`
+          : "";
+        return `<div class="card">
+          <div class="name">${esc(f.summary ?? f.decisionSubject ?? "Καταχώριση")}</div>
+          <div class="meta">${esc(f.dateRegistrated ?? "")}${f.kak ? " · ΚΑΚ " + esc(f.kak) : ""} ${link}</div>
+        </div>`;
+      }).join("");
+    }
+  </script>
+</Base>

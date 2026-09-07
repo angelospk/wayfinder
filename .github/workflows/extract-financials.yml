@@ -1,0 +1,73 @@
+name: extract financials
+
+# Reads the balance sheets of companies visitors have looked up, and stores the
+# figures. Parsing runs here because a free Cloudflare Worker gets 10 ms of CPU
+# per request, which is nowhere near enough for a PDF.
+on:
+  workflow_dispatch:
+    inputs:
+      ar_gemi:
+        description: "Parse these ΓΕΜΗ numbers instead of the queue (comma separated)"
+        required: false
+      limit:
+        description: "How many queued companies to parse"
+        required: false
+        default: "5"
+  schedule:
+    # Away from the top of the hour: scheduled runs there are the most delayed.
+    - cron: "17 */6 * * *"
+
+# Two runs would fight over the same branch and the same request budget.
+concurrency:
+  group: extract-financials
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install the extractor's dependencies
+        run: pip install --quiet pdfplumber
+
+      - name: Parse
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WAYFINDER_API_BASE: ${{ vars.WAYFINDER_API_BASE }}
+        run: |
+          set -euo pipefail
+          args=()
+          if [ -n "${{ inputs.ar_gemi }}" ]; then
+            IFS=',' read -ra ids <<< "${{ inputs.ar_gemi }}"
+            for id in "${ids[@]}"; do args+=(--ar-gemi "$(echo "$id" | tr -d ' ')"); done
+          else
+            args+=(--limit "${{ inputs.limit || '5' }}")
+          fi
+          python tools/extract_pending.py "${args[@]}"
+
+      - name: Publish the dataset
+        run: |
+          set -euo pipefail
+          git config user.name "wayfinder-bot"
+          git config user.email "wayfinder-bot@users.noreply.github.com"
+          if [ -z "$(git status --porcelain data/financials)" ]; then
+            echo "no new figures"
+            exit 0
+          fi
+          git add data/financials
+          git commit -m "data: financial figures from $(date -u +%Y-%m-%d)"
+          git push

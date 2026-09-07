@@ -11,7 +11,7 @@ REFRESH_AFTER_DAYS = "30"
 [[d1_databases]]
 binding = "DB"
 database_name = "wayfinder"
-database_id = "PLACEHOLDER_RUN_wrangler_d1_create_wayfinder"
+database_id = "995848b8-3927-4a69-9618-080d9c7d1b9e"
 
 [[durable_objects.bindings]]
 name = "DISPATCHER"

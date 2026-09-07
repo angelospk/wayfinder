@@ -7,3 +7,5 @@ __pycache__/
 .pytest_cache/
 *.pyc
 .astro/
+site/dist/
+worker/worker-configuration.d.ts
