@@ -1,0 +1,73 @@
+{
+ "status": "partial",
+ "reason": null,
+ "ar_gemi": "162155449000",
+ "afm": "801720795",
+ "fiscal_year": 2021,
+ "unit_multiplier": 1,
+ "currency": "EUR",
+ "figures": {
+  "turnover": {
+   "value": 0.0,
+   "page": 2,
+   "bbox": [
+    382.22,
+    495.08,
+    401.75,
+    506.12
+   ],
+   "page_width": 595.32,
+   "page_height": 841.92,
+   "label_matched": "Κύκλος εργασιών (καθαρός)",
+   "source": "extracted"
+  },
+  "pre_tax_profit": {
+   "value": -20.33,
+   "page": 2,
+   "bbox": [
+    373.09,
+    625.76,
+    401.77,
+    636.8
+   ],
+   "page_width": 595.32,
+   "page_height": 841.92,
+   "label_matched": "Αποτέλεσμα προ φόρων",
+   "source": "extracted"
+  },
+  "net_profit": {
+   "value": -20.33,
+   "page": 2,
+   "bbox": [
+    373.07,
+    654.8,
+    401.81,
+    665.84
+   ],
+   "page_width": 595.32,
+   "page_height": 841.92,
+   "label_matched": "Αποτέλεσμα περιόδου μετά από φόρους",
+   "source": "extracted"
+  },
+  "ebitda": {
+   "value": -20.33,
+   "source": "derived",
+   "derived_from": [
+    "pre_tax_profit",
+    "interest",
+    "depreciation"
+   ],
+   "formula": "pre_tax_profit - interest - depreciation"
+  }
+ },
+ "missing": [
+  "total_assets",
+  "equity"
+ ],
+ "notes": [
+  "total_assets 9988.0 != total_equity_and_liabilities -9988.3",
+  "total_assets 9988.0 != equity+liabilities -9988.3"
+ ],
+ "source_element_id": "3314798",
+ "source_registered": "2022-11-18"
+}
