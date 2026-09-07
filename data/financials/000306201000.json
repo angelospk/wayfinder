@@ -1,6 +1,6 @@
 {
  "status": "unparseable",
- "reason": "ambiguous_fiscal_year",
+ "reason": "multi_column_layout",
  "figures": {},
  "ar_gemi": "000306201000",
  "afm": "094316657",
@@ -8,7 +8,7 @@
  "unit_multiplier": 1000,
  "currency": "EUR",
  "notes": [
-  "column headers disagree on the current year: [2019, 2020, 2025, 2026]"
+  "header repeats the same two years twice"
  ],
  "source_element_id": "6094252",
  "source_registered": "2026-06-26"

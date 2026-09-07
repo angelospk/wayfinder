@@ -1,79 +1,14 @@
 {
- "status": "partial",
- "reason": null,
+ "status": "unparseable",
+ "reason": "multi_column_layout",
+ "figures": {},
  "ar_gemi": "014463835000",
  "afm": "094434361",
- "fiscal_year": 2024,
+ "fiscal_year": 2025,
  "unit_multiplier": 1,
  "currency": "EUR",
- "figures": {
-  "pre_tax_profit": {
-   "value": -818018.01,
-   "page": 2,
-   "bbox": [
-    322.44,
-    539.8,
-    350.79,
-    545.32
-   ],
-   "page_width": 841.92,
-   "page_height": 1190.52,
-   "label_matched": "Αποτέλεσμα προ φόρων",
-   "source": "extracted"
-  },
-  "net_profit": {
-   "value": -818018.01,
-   "page": 2,
-   "bbox": [
-    322.44,
-    554.2,
-    350.79,
-    559.72
-   ],
-   "page_width": 841.92,
-   "page_height": 1190.52,
-   "label_matched": "Αποτέλεσμα περιόδου μετά από φόρους",
-   "source": "extracted"
-  }
- },
- "missing": [
-  "turnover",
-  "ebitda",
-  "total_assets",
-  "equity"
- ],
  "notes": [
-  "depreciation: 1 amounts for 2 year columns",
-  "depreciation: 7 amounts for 2 year columns",
-  "short_term_liabilities: 1 amounts for 2 year columns",
-  "short_term_liabilities: 1 amounts for 2 year columns",
-  "short_term_liabilities: 1 amounts for 2 year columns",
-  "short_term_liabilities: 1 amounts for 2 year columns",
-  "turnover: 1 amounts for 2 year columns",
-  "turnover: 1 amounts for 2 year columns",
-  "turnover: 1 amounts for 2 year columns",
-  "turnover: 1 amounts for 2 year columns",
-  "depreciation: 1 amounts for 2 year columns",
-  "depreciation: 7 amounts for 2 year columns",
-  "short_term_liabilities: 1 amounts for 2 year columns",
-  "short_term_liabilities: 1 amounts for 2 year columns",
-  "short_term_liabilities: 1 amounts for 2 year columns",
-  "short_term_liabilities: 1 amounts for 2 year columns",
-  "turnover: 1 amounts for 2 year columns",
-  "turnover: 1 amounts for 2 year columns",
-  "turnover: 1 amounts for 2 year columns",
-  "turnover: 1 amounts for 2 year columns",
-  "depreciation: 1 amounts for 2 year columns",
-  "depreciation: 7 amounts for 2 year columns",
-  "short_term_liabilities: 1 amounts for 2 year columns",
-  "short_term_liabilities: 1 amounts for 2 year columns",
-  "short_term_liabilities: 1 amounts for 2 year columns",
-  "short_term_liabilities: 1 amounts for 2 year columns",
-  "turnover: 1 amounts for 2 year columns",
-  "turnover: 1 amounts for 2 year columns",
-  "turnover: 1 amounts for 2 year columns",
-  "turnover: 1 amounts for 2 year columns",
-  "ebitda: not derived, missing interest,depreciation"
+  "header repeats the same two years twice"
  ],
  "source_element_id": "5544911",
  "source_registered": "2025-09-29"

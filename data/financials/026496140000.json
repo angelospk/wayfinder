@@ -1,14 +1,104 @@
 {
- "status": "unparseable",
- "reason": "ambiguous_fiscal_year",
- "figures": {},
+ "status": "parsed",
+ "reason": null,
  "ar_gemi": "026496140000",
  "afm": "801265131",
- "fiscal_year": 2025,
+ "fiscal_year": 2024,
  "unit_multiplier": 1,
  "currency": "EUR",
+ "figures": {
+  "total_assets": {
+   "value": 26367267.0,
+   "page": 8,
+   "bbox": [
+    390.14,
+    565.01,
+    440.85,
+    574.63
+   ],
+   "page_width": 595.32,
+   "page_height": 841.92,
+   "label_matched": "Σύνολο Ενεργητικού",
+   "source": "extracted"
+  },
+  "equity": {
+   "value": 11934096.0,
+   "page": 9,
+   "bbox": [
+    390.14,
+    234.89,
+    440.85,
+    244.51
+   ],
+   "page_width": 595.32,
+   "page_height": 841.92,
+   "label_matched": "Σύνολο καθαρής θέσης",
+   "source": "extracted"
+  },
+  "turnover": {
+   "value": 25521800.0,
+   "page": 10,
+   "bbox": [
+    323.01,
+    158.13,
+    372.51,
+    168.32
+   ],
+   "page_width": 595.32,
+   "page_height": 841.92,
+   "label_matched": "Κύκλος εργασιών (καθαρός)",
+   "source": "extracted"
+  },
+  "ebit": {
+   "value": 1430184.0,
+   "page": 10,
+   "bbox": [
+    324.21,
+    300.81,
+    371.93,
+    311.0
+   ],
+   "page_width": 595.32,
+   "page_height": 841.92,
+   "label_matched": "Αποτελέσματα προ τόκων και φόρων",
+   "source": "extracted"
+  },
+  "pre_tax_profit": {
+   "value": 946616.0,
+   "page": 10,
+   "bbox": [
+    333.26,
+    356.61,
+    371.91,
+    366.8
+   ],
+   "page_width": 595.32,
+   "page_height": 841.92,
+   "label_matched": "Αποτέλεσμα προ φόρων",
+   "source": "extracted"
+  },
+  "net_profit": {
+   "value": 726666.0,
+   "page": 10,
+   "bbox": [
+    333.26,
+    399.81,
+    371.91,
+    410.01
+   ],
+   "page_width": 595.32,
+   "page_height": 841.92,
+   "label_matched": "Αποτέλεσμα περιόδου μετά από φόρους",
+   "source": "extracted"
+  }
+ },
+ "missing": [],
  "notes": [
-  "column headers disagree on the current year: [2024, 2025]"
+  "depreciation: 4 amounts for 2 year columns",
+  "depreciation: 4 amounts for 2 year columns",
+  "depreciation: 1 amounts for 2 year columns",
+  "depreciation: 1 amounts for 2 year columns",
+  "ebitda: not derived, interest/depreciation not shown as expenses"
  ],
  "source_element_id": "5504505",
  "source_registered": "2025-09-16"
