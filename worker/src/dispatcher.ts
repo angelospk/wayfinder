@@ -25,8 +25,15 @@ export const MAX_QUEUE = 200;
 export const MAX_ATTEMPTS = 3;
 export const NEGATIVE_TTL_MS = 24 * 60 * 60 * 1000;
 
+/**
+ * RPC return values must be structured-clonable, which `unknown` is not, and a
+ * recursive JSON type makes the RPC type machinery give up. GEMI always answers
+ * with an object or an array, so `object` is both true and cheap to check.
+ */
+export type Payload = object;
+
 export type Ensure =
-  | { state: "done"; payload: unknown; fetchedAt: number }
+  | { state: "done"; payload: Payload; fetchedAt: number }
   | { state: "pending"; queued: number; etaMs: number }
   | { state: "absent"; httpStatus: number; until: number }
   | { state: "rejected"; reason: string; retryAfterMs: number };
@@ -260,9 +267,10 @@ export class GemiDispatcher extends DurableObject<Env> {
       return this.retryOrGiveUp(key, job, `http_${res.status}`);
     }
 
-    let payload: unknown;
+    let payload: Payload;
     try {
       payload = await res.json();
+      if (payload === null || typeof payload !== "object") throw new Error("not an object");
     } catch {
       return this.retryOrGiveUp(key, job, "bad_json");
     }
@@ -308,7 +316,7 @@ export class GemiDispatcher extends DurableObject<Env> {
     return { payload: JSON.parse(row.payload), fetchedAt: row.fetched_at };
   }
 
-  private async writeSnapshot(key: string, resource: Resource, payload: unknown, at: number) {
+  private async writeSnapshot(key: string, resource: Resource, payload: Payload, at: number) {
     const arGemi = "arGemi" in resource ? resource.arGemi : null;
     const stmts: D1PreparedStatement[] = [
       this.env.DB.prepare(
