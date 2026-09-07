@@ -7,6 +7,8 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 GEMI_BASE = "https://opendata-api.businessportal.gr/api/opendata/v1"
 REFRESH_AFTER_DAYS = "30"
+# GEMI allows 8 requests/minute for the whole key. 10.1s between calls is ~5.9.
+MIN_GAP_MS = "10100"
 
 [[d1_databases]]
 binding = "DB"

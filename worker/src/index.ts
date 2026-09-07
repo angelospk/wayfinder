@@ -76,7 +76,7 @@ function envelope(result: Ensure, extra: Record<string, unknown> = {}): Response
       return json(
         { data: null, meta: { state: "unavailable", reason: result.reason } },
         {
-          status: result.reason.startsWith("auth_") ? 503 : 503,
+          status: 503,
           headers: { "retry-after": String(Math.ceil(result.retryAfterMs / 1000) || 60) },
         },
       );

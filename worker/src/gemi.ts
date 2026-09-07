@@ -27,6 +27,7 @@ export function normalizeQuery(raw: string): string {
     .replace(/[̀-ͯ]/g, "")
     .toUpperCase()
     .replace(/ς/gi, "Σ")
+    .replace(/\|/g, " ")   // "|" separates the fields of a resource key
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, 120);

@@ -146,3 +146,23 @@ describe("search warms profiles", () => {
     expect((await attempts("054414421000")).length).toBe(0);
   });
 });
+
+describe("staleness", () => {
+  it("serves an old snapshot at once and refreshes it in the background", async () => {
+    const { dispatcher, profile, mine } = scope();
+    const key = profile(700);
+    expect((await dispatcher.ensure(key)).state).toBe("done");
+
+    // Age the snapshot past its refresh date.
+    await env.DB.prepare("UPDATE snapshots SET refresh_due_at = 1 WHERE resource_key = ?")
+      .bind(key).run();
+    await resetAttempts();
+
+    const again = await dispatcher.ensure(key);
+    expect(again.state).toBe("done");          // the visitor never waits
+    expect((await mine()).length).toBe(0);     // and never pays for a slot
+
+    await sleep(GAP * 3);
+    expect((await mine()).length).toBe(1);     // the refresh happened behind them
+  });
+});

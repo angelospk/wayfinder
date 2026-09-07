@@ -42,7 +42,12 @@ def d1(sql: str) -> list[dict]:
     )
     if out.returncode != 0:
         raise SystemExit(f"d1 failed: {out.stderr[-2000:]}")
-    payload = json.loads(out.stdout[out.stdout.index("["):])
+    # wrangler prints a banner before the JSON, and nothing at all when it fails
+    # in a way that still exits 0.
+    start = out.stdout.find("[")
+    if start < 0:
+        raise SystemExit(f"d1 returned no JSON:\n{out.stdout[-2000:]}\n{out.stderr[-1000:]}")
+    payload = json.loads(out.stdout[start:])
     return payload[0].get("results", [])
 
 

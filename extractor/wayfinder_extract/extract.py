@@ -29,7 +29,6 @@ _THOUSANDS = re.compile(r"ΠΟΣΑ ΣΕ ΧΙΛΙΑΔΕΣ")
 _ELSEWHERE = re.compile(
     r"ΔΙΑΔΡΑΣΤΙΚΟ ΣΥΝΔΕΣΜΟ|ΜΟΝΑΔΙΚΟΣ ΣΥΝΔΕΣΜΟΣ|QR ΚΩΔΙΚ|XHTML|ESEF"
 )
-_UNITS = re.compile(r"ΠΟΣΑ ΣΕ (?:ΕΥΡΩ|Ε)\b|ΠΟΣΑ ΣΕ $")
 
 
 GLUE_GAP = 1.0               # points; below this two "words" are one word
@@ -202,6 +201,8 @@ def _document_facts(full_text: str) -> dict:
     norm = normalize(full_text)
     facts: dict[str, Any] = {
         "ar_gemi": None, "afm": None, "fiscal_year": None,
+        # Greek statutory filings are in euro by law; the only thing that varies
+        # is whether the amounts are printed in units or in thousands.
         "unit_multiplier": 1, "currency": "EUR", "period_end_years": [],
     }
     m = _GEMI.search(full_text)

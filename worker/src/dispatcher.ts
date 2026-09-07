@@ -117,7 +117,19 @@ export class GemiDispatcher extends DurableObject<Env> {
 
     if (!opts.refresh) {
       const hit = await this.readSnapshot(key);
-      if (hit) return { state: "done", payload: hit.payload, fetchedAt: hit.fetchedAt };
+      if (hit) {
+        if (hit.refreshDueAt <= now) {
+          // Serve what we have and queue a refresh. Making the visitor wait for
+          // a slot would punish them for arriving after the snapshot aged.
+          this.sql.exec(
+            `INSERT INTO jobs (resource_key, created_at, next_attempt_at) VALUES (?, ?, ?)
+             ON CONFLICT (resource_key) DO NOTHING`,
+            key, now, now,
+          );
+          await this.armAlarm();
+        }
+        return { state: "done", payload: hit.payload, fetchedAt: hit.fetchedAt };
+      }
     }
 
     if (this.reserve(now) !== null) {
@@ -204,7 +216,7 @@ export class GemiDispatcher extends DurableObject<Env> {
         const resource = parseResourceKey(job.resource_key);
         // Re-check the cache: another path may have filled it since we queued.
         const hit = resource ? await this.readSnapshot(job.resource_key) : null;
-        if (hit || !resource) {
+        if (!resource || (hit && hit.refreshDueAt > now)) {
           this.sql.exec("DELETE FROM jobs WHERE resource_key = ?", job.resource_key);
         } else {
           await this.attempt(resource, job.resource_key, job);
@@ -212,7 +224,9 @@ export class GemiDispatcher extends DurableObject<Env> {
       }
     }
     const remaining = this.sql.exec("SELECT MIN(next_attempt_at) AS t FROM jobs").one() as any;
-    if (remaining.t != null) {
+    if (remaining.t != null && !this.pacing().paused_reason) {
+      // A paused dispatcher is waiting for a human to fix the key. Re-arming
+      // would burn the free plan's daily Durable Object budget doing nothing.
       await this.ctx.storage.setAlarm(Date.now() + Math.max(this.waitMs(Date.now()), 50));
     }
   }
@@ -309,11 +323,15 @@ export class GemiDispatcher extends DurableObject<Env> {
 
   private async readSnapshot(key: string) {
     const row = await this.env.DB
-      .prepare("SELECT payload, fetched_at FROM snapshots WHERE resource_key = ?")
+      .prepare("SELECT payload, fetched_at, refresh_due_at FROM snapshots WHERE resource_key = ?")
       .bind(key)
-      .first<{ payload: string; fetched_at: number }>();
+      .first<{ payload: string; fetched_at: number; refresh_due_at: number }>();
     if (!row) return null;
-    return { payload: JSON.parse(row.payload), fetchedAt: row.fetched_at };
+    return {
+      payload: JSON.parse(row.payload),
+      fetchedAt: row.fetched_at,
+      refreshDueAt: row.refresh_due_at,
+    };
   }
 
   private async writeSnapshot(key: string, resource: Resource, payload: Payload, at: number) {

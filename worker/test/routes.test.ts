@@ -62,7 +62,7 @@ describe("document download", () => {
 });
 
 describe("every answer is dated", () => {
-  it("carries fetched_at and the ΓΕΜΗ attribution", async () => {
+  it("carries fetched_at and the ΓΕΜΗ attribution", { timeout: 20_000 }, async () => {
     await control({ body: { arGemi: "000000009100", coNameEl: "ΔΟΚΙΜΗ" } });
     let body: any;
     // The first call may be queued behind the pace; drain until it lands.

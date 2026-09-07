@@ -11,6 +11,7 @@ import re
 import sys
 import time
 import unicodedata
+import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -109,10 +110,14 @@ def find(name: str, legal_type: str | None = None):
         return []
     target = norm(name)
     scored = []
-    for c in res.get("searchResults", []):
+    for c in res.get("searchResults", []) or []:
+        ar = c.get("arGemi")
+        if not ar:
+            continue
         label = norm(c.get("coNameEl") or "")
         score = sum(1 for tok in target.split() if tok in label)
-        scored.append((score, c["arGemi"], c.get("coNameEl"), c["legalType"]["descr"]))
+        scored.append((score, ar, c.get("coNameEl"),
+                       (c.get("legalType") or {}).get("descr") or "?"))
     scored.sort(reverse=True)
     return scored
 
