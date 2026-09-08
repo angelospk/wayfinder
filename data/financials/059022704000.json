@@ -1,0 +1,15 @@
+{
+ "status": "unparseable",
+ "reason": "multi_column_layout",
+ "figures": {},
+ "ar_gemi": "059022704000",
+ "afm": "998386030",
+ "fiscal_year": 2025,
+ "unit_multiplier": 1,
+ "currency": "EUR",
+ "notes": [
+  "header repeats the same two years twice"
+ ],
+ "source_element_id": "6105043",
+ "source_registered": "2026-07-07"
+}
