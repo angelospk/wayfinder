@@ -1,0 +1,20 @@
+{
+ "status": "unparseable",
+ "reason": "no_recognised_line_items",
+ "figures": {},
+ "ar_gemi": "053675411000",
+ "afm": null,
+ "fiscal_year": 2021,
+ "unit_multiplier": 1,
+ "currency": "EUR",
+ "notes": [
+  "total_assets: column header [2020, 2019] does not contain fiscal year 2021",
+  "equity: column header [2020, 2019] does not contain fiscal year 2021",
+  "short_term_liabilities: column header [2020, 2019] does not contain fiscal year 2021",
+  "turnover: column header [2020, 2019] does not contain fiscal year 2021",
+  "pre_tax_profit: column header [2020, 2019] does not contain fiscal year 2021",
+  "ebitda: not derived, missing pre_tax_profit,interest,depreciation"
+ ],
+ "source_element_id": "5776272",
+ "source_registered": "2025-12-19"
+}
