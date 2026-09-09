@@ -1,0 +1,49 @@
+{
+ "status": "partial",
+ "reason": null,
+ "ar_gemi": "012026459000",
+ "afm": null,
+ "fiscal_year": 2019,
+ "unit_multiplier": 1,
+ "currency": "EUR",
+ "figures": {
+  "turnover": {
+   "value": 129444.44,
+   "page": 3,
+   "bbox": [
+    248.25,
+    188.2,
+    300.71,
+    198.7
+   ],
+   "page_width": 595,
+   "page_height": 842,
+   "label_matched": "Κύκλος εργασιών (καθαρός)",
+   "source": "extracted"
+  },
+  "pre_tax_profit": {
+   "value": 35.57,
+   "page": 3,
+   "bbox": [
+    261.75,
+    440.2,
+    287.98,
+    450.7
+   ],
+   "page_width": 595,
+   "page_height": 842,
+   "label_matched": "Αποτέλεσμα προ φόρων",
+   "source": "extracted"
+  }
+ },
+ "missing": [
+  "net_profit",
+  "total_assets",
+  "equity"
+ ],
+ "notes": [
+  "ebitda: not derived, missing interest,depreciation"
+ ],
+ "source_element_id": "2563985",
+ "source_registered": "2021-06-15"
+}
