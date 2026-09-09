@@ -1,0 +1,107 @@
+{
+ "status": "parsed",
+ "reason": null,
+ "ar_gemi": "051305919000",
+ "afm": "094394659",
+ "fiscal_year": 2025,
+ "unit_multiplier": 1,
+ "currency": "EUR",
+ "figures": {
+  "total_assets": {
+   "value": 50169352.64,
+   "page": 8,
+   "bbox": [
+    393.7,
+    710.98,
+    457.06,
+    722.02
+   ],
+   "page_width": 595.32,
+   "page_height": 841.92,
+   "label_matched": "Σύνολο Ενεργητικού",
+   "source": "extracted"
+  },
+  "equity": {
+   "value": 34270368.59,
+   "page": 9,
+   "bbox": [
+    393.94,
+    286.35,
+    457.3,
+    297.39
+   ],
+   "page_width": 595.32,
+   "page_height": 841.92,
+   "label_matched": "Σύνολο καθαρής θέσης",
+   "source": "extracted"
+  },
+  "ebit": {
+   "value": 5777615.41,
+   "page": 10,
+   "bbox": [
+    400.78,
+    420.53,
+    458.62,
+    431.57
+   ],
+   "page_width": 595.32,
+   "page_height": 841.92,
+   "label_matched": "Αποτέλεσμα προ τόκων και φόρων",
+   "source": "extracted"
+  },
+  "pre_tax_profit": {
+   "value": 5902460.42,
+   "page": 10,
+   "bbox": [
+    400.78,
+    502.37,
+    458.62,
+    513.41
+   ],
+   "page_width": 595.32,
+   "page_height": 841.92,
+   "label_matched": "Αποτέλεσμα προ φόρων",
+   "source": "extracted"
+  },
+  "net_profit": {
+   "value": 4998418.22,
+   "page": 10,
+   "bbox": [
+    400.78,
+    588.2,
+    458.62,
+    599.24
+   ],
+   "page_width": 595.32,
+   "page_height": 841.92,
+   "label_matched": "Αποτέλεσμα περιόδου μετά από φόρους",
+   "source": "extracted"
+  },
+  "turnover": {
+   "value": 55582707.02,
+   "page": 43,
+   "bbox": [
+    348.85,
+    550.1,
+    398.07,
+    562.9
+   ],
+   "page_width": 595.32,
+   "page_height": 841.92,
+   "label_matched": "Πωλήσεις",
+   "source": "extracted"
+  }
+ },
+ "missing": [],
+ "notes": [
+  "turnover: 3 amounts for 2 year columns",
+  "interest: 3 amounts for 2 year columns",
+  "depreciation: 4 amounts for 2 year columns",
+  "depreciation: 4 amounts for 2 year columns",
+  "depreciation: 1 amounts for 2 year columns",
+  "depreciation: 1 amounts for 2 year columns",
+  "ebitda: not derived, missing interest"
+ ],
+ "source_element_id": "6143986",
+ "source_registered": "2026-08-18"
+}
